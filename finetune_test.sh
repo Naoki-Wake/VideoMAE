@@ -1,6 +1,6 @@
-OUTPUT_DIR='./demo/debug'
-DATA_PATH='/home/nawake/sthv2/'
-MODEL_PATH='/home/nawake/code/VideoMAE/checkpoint.pth'
+OUTPUT_DIR='/lfovision_log/videomae/finetune/debug'
+DATA_PATH='/lfovision_sthv2_breakfast/'
+MODEL_PATH='/lfovision_pretrained_models/videomae/pretraining/sthv2/checkpoint.pth'
 
 OMP_NUM_THREADS=1 python run_class_finetuning.py \
     --model vit_base_patch16_224 \
