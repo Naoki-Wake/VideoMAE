@@ -41,11 +41,12 @@ class HOUSEHOLDVideoClsDataset(Dataset):
             raise ImportError("Unable to import `decord` which is required to read videos.")
 
         import pandas as pd
-        import pdb;pdb.set_trace()
+        #import pdb;pdb.set_trace()
         cleaned = pd.read_csv(self.anno_path, header=None, delimiter=' ')
-        self.dataset_samples = list(cleaned.values[:, 0])
+        tmp_dataset_samples = list(cleaned.values[:, 0])
+        self.dataset_samples = [os.path.join(self.data_path, i) for i in tmp_dataset_samples]
         self.label_array = list(cleaned.values[:, 1])
-
+        # import pdb;pdb.set_trace()
         if (mode == 'train'):
             pass
 

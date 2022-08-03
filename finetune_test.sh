@@ -1,9 +1,8 @@
-OUTPUT_DIR='./demo/ssv2_videomae_pretrain_base_patch16_224_frame_16x2_tube_mask_ratio_0.9_e800/eval_lr_5e-4_epoch_50'
+OUTPUT_DIR='./demo/debug'
 DATA_PATH='/home/nawake/sthv2/'
 MODEL_PATH='/home/nawake/code/VideoMAE/checkpoint.pth'
 
-OMP_NUM_THREADS=1 torchrun \
-    run_class_finetuning.py \
+OMP_NUM_THREADS=1 python run_class_finetuning.py \
     --model vit_base_patch16_224 \
     --data_set HOUSEHOLD \
     --nb_classes 11 \
@@ -11,7 +10,7 @@ OMP_NUM_THREADS=1 torchrun \
     --finetune ${MODEL_PATH} \
     --log_dir ${OUTPUT_DIR} \
     --output_dir ${OUTPUT_DIR} \
-    --batch_size 8 \
+    --batch_size 1 \
     --num_sample 1 \
     --input_size 224 \
     --short_side_size 224 \

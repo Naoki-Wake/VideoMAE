@@ -289,6 +289,7 @@ def main(args, ds_init):
 
     mixup_fn = None
     mixup_active = args.mixup > 0 or args.cutmix > 0. or args.cutmix_minmax is not None
+    mixup_active = False
     if mixup_active:
         print("Mixup is activated!")
         mixup_fn = Mixup(

@@ -92,17 +92,27 @@ def build_dataset(is_train, test_mode, args):
         anno_path = None
         if is_train is True:
             mode = 'train'
-            anno_path = os.path.join(args.data_path, 'annotations/with_pseudo_relabeled/iteration_1/breakfast_train_list_videos_mixed.txt')
+            anno_path = os.path.join(args.data_path, 'annotations/wo_pseudo/breakfast_train_list_videos.txt')
         elif test_mode is True:
             mode = 'test'
-            anno_path = os.path.join(args.data_path, 'annotations/with_pseudo_relabeled/breakfast_test_list_videos.txt') 
+            anno_path = os.path.join(args.data_path, 'annotations/wo_pseudo/breakfast_test_list_videos.txt') 
         else:  
             mode = 'validation'
-            anno_path = os.path.join(args.data_path, 'annotations/with_pseudo_relabeled/breakfast_val_list_videos.txt') 
+            anno_path = os.path.join(args.data_path, 'annotations/wo_pseudo/breakfast_val_list_videos.txt') 
+
+#        if is_train is True:
+#            mode = 'train'
+#            anno_path = os.path.join(args.data_path, 'annotations/with_pseudo_relabeled/iteration_1/breakfast_train_list_videos_mixed.txt')
+#        elif test_mode is True:
+#            mode = 'test'
+#            anno_path = os.path.join(args.data_path, 'annotations/with_pseudo_relabeled/breakfast_test_list_videos.txt') 
+#        else:  
+#            mode = 'validation'
+#            anno_path = os.path.join(args.data_path, 'annotations/with_pseudo_relabeled/breakfast_val_list_videos.txt') 
         # import pdb;pdb.set_trace()
-        dataset = SSVideoClsDataset(
+        dataset = HOUSEHOLDVideoClsDataset(
             anno_path=anno_path,
-            data_path='/',
+            data_path=args.data_path,
             mode=mode,
             clip_len=1,
             num_segment=args.num_frames,
