@@ -99,7 +99,7 @@ def main(args):
 
     model.to(device)
     checkpoint = torch.load(args.model_path, map_location='cpu')
-    model.load_state_dict(checkpoint['module'])
+    model.load_state_dict(checkpoint['model'])
     model.eval()
 
     if args.save_path:
@@ -116,12 +116,12 @@ def main(args):
     
     tmp = np.arange(0,32, 2) + 60
     frame_id_list = tmp.tolist()
-    # average_duration = (duration - skip_length + 1) // args.num_frames
-    # if average_duration > 0:
-    #     frame_id_list = np.multiply(list(range(args.num_frames)),
-    #                             average_duration)
-    #     frame_id_list = frame_id_list + np.random.randint(average_duration,
-    #                                             size=args.num_frames)
+    average_duration = (duration - skip_length + 1) // args.num_frames
+    if average_duration > 0:
+        frame_id_list = np.multiply(list(range(args.num_frames)),
+                                average_duration)
+        frame_id_list = frame_id_list + np.random.randint(average_duration,
+                                                size=args.num_frames)
 
     video_data = vr.get_batch(frame_id_list).asnumpy()
     print(video_data.shape)
@@ -133,7 +133,7 @@ def main(args):
     img = img.view((args.num_frames , 3) + img.size()[-2:]).transpose(0,1) # T*C,H,W -> T,C,H,W -> C,T,H,W
     # img = img.view(( -1 , args.num_frames) + img.size()[-2:]) 
     bool_masked_pos = torch.from_numpy(bool_masked_pos)
-
+    import pdb;pdb.set_trace()
     with torch.no_grad():
         # img = img[None, :]
         # bool_masked_pos = bool_masked_pos[None, :]
@@ -144,7 +144,7 @@ def main(args):
         img = img.to(device, non_blocking=True)
         bool_masked_pos = bool_masked_pos.to(device, non_blocking=True).flatten(1).to(torch.bool)
         outputs = model(img, bool_masked_pos)
-
+        pdb.set_trace()
         #save original video
         mean = torch.as_tensor(IMAGENET_DEFAULT_MEAN).to(device)[None, :, None, None, None]
         std = torch.as_tensor(IMAGENET_DEFAULT_STD).to(device)[None, :, None, None, None]
@@ -152,7 +152,7 @@ def main(args):
         imgs = [ToPILImage()(ori_img[0,:,vid,:,:].cpu()) for vid, _ in enumerate(frame_id_list)  ]
         for id, im in enumerate(imgs):
             im.save(f"{args.save_path}/ori_img{id}.jpg")
-
+        pdb.set_trace()
         img_squeeze = rearrange(ori_img, 'b c (t p0) (h p1) (w p2) -> b (t h w) (p0 p1 p2) c', p0=2, p1=patch_size[0], p2=patch_size[0])
         img_norm = (img_squeeze - img_squeeze.mean(dim=-2, keepdim=True)) / (img_squeeze.var(dim=-2, unbiased=True, keepdim=True).sqrt() + 1e-6)
         img_patch = rearrange(img_norm, 'b n p c -> b n (p c)')
