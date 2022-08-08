@@ -36,3 +36,4 @@ if __name__ == '__main__':
         --enable_deepspeed"
     import subprocess
     print(train_command)
+    os.system(train_command)
