@@ -92,13 +92,13 @@ def build_dataset(is_train, test_mode, args):
         anno_path = None
         if is_train is True:
             mode = 'train'
-            anno_path = os.path.join(args.data_path, 'annotations/wo_pseudo/breakfast_train_list_videos.txt')
+            anno_path = os.path.join(args.data_path, args.household_fp_train)
         elif test_mode is True:
             mode = 'test'
-            anno_path = os.path.join(args.data_path, 'annotations/wo_pseudo/breakfast_test_list_videos.txt') 
+            anno_path = os.path.join(args.data_path, args.household_fp_test) 
         else:  
             mode = 'validation'
-            anno_path = os.path.join(args.data_path, 'annotations/wo_pseudo/breakfast_val_list_videos.txt') 
+            anno_path = os.path.join(args.data_path, args.household_fp_val) 
 
 #        if is_train is True:
 #            mode = 'train'

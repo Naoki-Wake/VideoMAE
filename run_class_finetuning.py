@@ -174,6 +174,13 @@ def get_args():
     parser.add_argument('--no_pin_mem', action='store_false', dest='pin_mem')
     parser.set_defaults(pin_mem=True)
 
+    parser.add_argument('--household_fp_train', default='annotations/wo_pseudo/breakfast_train_list_videos.txt',
+                        help='file path to the train file')
+    parser.add_argument('--household_fp_test', default='annotations/wo_pseudo/breakfast_test_list_videos.txt',
+                        help='file path to the test file')
+    parser.add_argument('--household_fp_val', default='annotations/wo_pseudo/breakfast_val_list_videos.txt',
+                        help='file path to the val file')
+
     # distributed training parameters
     parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
