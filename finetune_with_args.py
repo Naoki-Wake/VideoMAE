@@ -33,5 +33,5 @@ if __name__ == '__main__':
         --test_num_segment 2 \
         --test_num_crop 3 \
         --enable_deepspeed"
-        import subprocess
-        print(train_command)
+    import subprocess
+    print(train_command)
