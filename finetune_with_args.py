@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser('VideoMAE pre-training script', add_help=False)
     parser.add_argument('--lr', default=0.0075, type=float)
     args = parser.parse_args()
     OUTPUT_DIR='/lfovision_log/videomae/finetune/debug'
