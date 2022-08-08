@@ -7,10 +7,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('VideoMAE pre-training script', add_help=False)
     parser.add_argument('--lr', default=0.0075, type=float)
     args = parser.parse_args()
-    OUTPUT_DIR='/lfovision_log/videomae/finetune/debug'
+    LR=args.lr
+    OUTPUT_DIR='/lfovision_log/videomae/finetune/experiment_paramsearch/LR_'+str(LR)
     DATA_PATH='/lfovision_sthv2_breakfast/'
     MODEL_PATH='/lfovision_pretrained_models/videomae/pretraining/sthv2/checkpoint.pth'
-    LR=args.lr
     train_command = "OMP_NUM_THREADS=1 python run_class_finetuning.py \
         --model vit_base_patch16_224 \
         --data_set HOUSEHOLD \
