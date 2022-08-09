@@ -11,11 +11,13 @@ if __name__ == '__main__':
     parser.add_argument('--household_fp_test', default='annotations/wo_pseudo/breakfast_test_list_videos.txt',
                         help='file path to the test file')
     parser.add_argument('--household_fp_val', default='annotations/wo_pseudo/breakfast_val_list_videos.txt',
-                        help='file path to the val file')    
+                        help='file path to the val file')
+    parser.add_argument('--out_dir', default='/lfovision_log/videomae/finetune/experiment_paramsearch/LR_',
+                        help='outdir')
     #annotations/with_pseudo_largedatanum
     args = parser.parse_args()
     LR=args.lr
-    OUTPUT_DIR='/lfovision_log/videomae/finetune/experiment_paramsearch/LR_'+str(LR)
+    OUTPUT_DIR=args.out_dir+str(LR)
     DATA_PATH='/lfovision_sthv2_breakfast/'
     MODEL_PATH='/lfovision_pretrained_models/videomae/pretraining/sthv2/checkpoint.pth'
     train_command = "OMP_NUM_THREADS=1 python run_class_finetuning.py \
