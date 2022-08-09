@@ -6,6 +6,13 @@ import numpy as np
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('VideoMAE pre-training script', add_help=False)
     parser.add_argument('--lr', default=0.0075, type=float)
+    parser.add_argument('--household_fp_train', default='annotations/wo_pseudo/breakfast_train_list_videos.txt',
+                        help='file path to the train file')
+    parser.add_argument('--household_fp_test', default='annotations/wo_pseudo/breakfast_test_list_videos.txt',
+                        help='file path to the test file')
+    parser.add_argument('--household_fp_val', default='annotations/wo_pseudo/breakfast_val_list_videos.txt',
+                        help='file path to the val file')    
+    #annotations/with_pseudo_largedatanum
     args = parser.parse_args()
     LR=args.lr
     OUTPUT_DIR='/lfovision_log/videomae/finetune/experiment_paramsearch/LR_'+str(LR)
@@ -33,7 +40,10 @@ if __name__ == '__main__':
         --dist_eval \
         --test_num_segment 2 \
         --test_num_crop 3 \
-        --enable_deepspeed"
+        --enable_deepspeed \
+        --household_fp_train " + args.household_fp_train + " " + \
+        "--household_fp_test " + args.household_fp_test + " " + \
+        "--household_fp_val " + args.household_fp_val + " " + \
     import subprocess
     print(train_command)
     os.system(train_command)
