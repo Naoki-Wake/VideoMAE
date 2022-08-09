@@ -43,7 +43,7 @@ if __name__ == '__main__':
         --enable_deepspeed \
         --household_fp_train " + args.household_fp_train + " " + \
         "--household_fp_test " + args.household_fp_test + " " + \
-        "--household_fp_val " + args.household_fp_val + " " + \
+        "--household_fp_val " + args.household_fp_val
     import subprocess
     print(train_command)
     os.system(train_command)
