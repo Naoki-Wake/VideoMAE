@@ -35,6 +35,21 @@ class GroupRandomCrop(object):
 
         return (out_images, label)
 
+class GroupReshape(object):
+    def __init__(self, size):
+        self.worker = torchvision.transforms.Resize((size,size))
+
+    def __call__(self, img_tuple):
+        img_group, label = img_tuple
+        return ([self.worker(img) for img in img_group], label)
+
+class GroupCenterAreaCrop(object):
+    def __init__(self, size):
+        self.center = torchvision.transforms.CenterCrop(size)
+        self.resize = torchvision.transforms.Resize(size)
+    def __call__(self, img_tuple):
+        img_group, label = img_tuple
+        return ([self.center(self.resize(img)) for img in img_group], label)
 
 class GroupCenterCrop(object):
     def __init__(self, size):

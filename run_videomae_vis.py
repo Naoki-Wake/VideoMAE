@@ -22,7 +22,9 @@ class DataAugmentationForVideoMAE(object):
         self.input_mean = [0.485, 0.456, 0.406] # IMAGENET_DEFAULT_MEAN
         self.input_std = [0.229, 0.224, 0.225] # IMAGENET_DEFAULT_STD
         normalize = GroupNormalize(self.input_mean, self.input_std)
-        self.train_augmentation = GroupCenterCrop(args.input_size)
+        #self.train_augmentation = GroupCenterCrop(args.input_size)
+        #self.train_augmentation = GroupReshape(args.input_size)
+        self.train_augmentation = GroupCenterAreaCrop(args.input_size)
         self.transform = transforms.Compose([                            
             self.train_augmentation,
             Stack(roll=False),
@@ -84,6 +86,17 @@ def get_model(args):
 
     return model
 
+def sample_frame_indices(clip_len, frame_sample_rate, seg_len):
+    converted_len = int(clip_len * frame_sample_rate)
+    if converted_len < seg_len:
+        end_idx = np.random.randint(converted_len, seg_len)
+        start_idx = end_idx - converted_len
+    else:
+        end_idx = seg_len
+        start_idx = 0
+    indices = np.linspace(start_idx, end_idx, num=clip_len)
+    indices = np.clip(indices, start_idx, end_idx - 1).astype(np.int64)
+    return indices
 
 def main(args):
     print(args)
@@ -123,28 +136,33 @@ def main(args):
         frame_id_list = frame_id_list + np.random.randint(average_duration,
                                                 size=args.num_frames)
 
-    video_data = vr.get_batch(frame_id_list).asnumpy()
+    indices = sample_frame_indices(clip_len=16, frame_sample_rate=4, seg_len=len(vr))
+
+    #video_data = vr.get_batch(frame_id_list).asnumpy()
+    video_data = vr.get_batch(indices).asnumpy()    
     print(video_data.shape)
     img = [Image.fromarray(video_data[vid, :, :, :]).convert('RGB') for vid, _ in enumerate(frame_id_list)]
-
+    #import pdb; pdb.set_trace()
     transforms = DataAugmentationForVideoMAE(args)
     img, bool_masked_pos = transforms((img, None)) # T*C,H,W
     # print(img.shape)
+    #import pdb; pdb.set_trace()
     img = img.view((args.num_frames , 3) + img.size()[-2:]).transpose(0,1) # T*C,H,W -> T,C,H,W -> C,T,H,W
     # img = img.view(( -1 , args.num_frames) + img.size()[-2:]) 
     bool_masked_pos = torch.from_numpy(bool_masked_pos)
-    import pdb;pdb.set_trace()
+    #import pdb; pdb.set_trace()
+    #import pdb;pdb.set_trace()
     with torch.no_grad():
         # img = img[None, :]
         # bool_masked_pos = bool_masked_pos[None, :]
         img = img.unsqueeze(0)
         print(img.shape)
         bool_masked_pos = bool_masked_pos.unsqueeze(0)
-        
+        #import pdb; pdb.set_trace()
         img = img.to(device, non_blocking=True)
         bool_masked_pos = bool_masked_pos.to(device, non_blocking=True).flatten(1).to(torch.bool)
         outputs = model(img, bool_masked_pos)
-        pdb.set_trace()
+        #pdb.set_trace()
         #save original video
         mean = torch.as_tensor(IMAGENET_DEFAULT_MEAN).to(device)[None, :, None, None, None]
         std = torch.as_tensor(IMAGENET_DEFAULT_STD).to(device)[None, :, None, None, None]
@@ -152,7 +170,7 @@ def main(args):
         imgs = [ToPILImage()(ori_img[0,:,vid,:,:].cpu()) for vid, _ in enumerate(frame_id_list)  ]
         for id, im in enumerate(imgs):
             im.save(f"{args.save_path}/ori_img{id}.jpg")
-        pdb.set_trace()
+        #pdb.set_trace()
         img_squeeze = rearrange(ori_img, 'b c (t p0) (h p1) (w p2) -> b (t h w) (p0 p1 p2) c', p0=2, p1=patch_size[0], p2=patch_size[0])
         img_norm = (img_squeeze - img_squeeze.mean(dim=-2, keepdim=True)) / (img_squeeze.var(dim=-2, unbiased=True, keepdim=True).sqrt() + 1e-6)
         img_patch = rearrange(img_norm, 'b n p c -> b n (p c)')
@@ -179,6 +197,14 @@ def main(args):
         imgs = [ToPILImage()(img_mask[0, :, vid, :, :].cpu()) for vid, _ in enumerate(frame_id_list)]
         for id, im in enumerate(imgs):
             im.save(f"{args.save_path}/mask_img{id}.jpg")
+
+        # create gif    
+        images = [Image.open(f"{args.save_path}/ori_img{id}.jpg") for id in range(len(imgs))] # open all images
+        images[0].save(f"{args.save_path}/ori.gif", save_all=True, append_images=images[1:], duration=100, loop=0)
+        images = [Image.open(f"{args.save_path}/rec_img{id}.jpg") for id in range(args.num_frames)] # open all images
+        images[0].save(f"{args.save_path}/rec.gif", save_all=True, append_images=images[1:], duration=100, loop=0)
+        images = [Image.open(f"{args.save_path}/mask_img{id}.jpg") for id in range(args.num_frames)] # open all images
+        images[0].save(f"{args.save_path}/mask.gif", save_all=True, append_images=images[1:], duration=100, loop=0)
 
 if __name__ == '__main__':
     opts = get_args()
