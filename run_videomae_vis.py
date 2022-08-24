@@ -112,7 +112,7 @@ def main(args):
 
     model.to(device)
     checkpoint = torch.load(args.model_path, map_location='cpu')
-    model.load_state_dict(checkpoint['module'])
+    model.load_state_dict(checkpoint['model'])
     model.eval()
 
     if args.save_path:
@@ -162,7 +162,7 @@ def main(args):
         img = img.to(device, non_blocking=True)
         bool_masked_pos = bool_masked_pos.to(device, non_blocking=True).flatten(1).to(torch.bool)
         outputs = model(img, bool_masked_pos)
-        #pdb.set_trace()
+        import pdb;pdb.set_trace()
         #save original video
         mean = torch.as_tensor(IMAGENET_DEFAULT_MEAN).to(device)[None, :, None, None, None]
         std = torch.as_tensor(IMAGENET_DEFAULT_STD).to(device)[None, :, None, None, None]

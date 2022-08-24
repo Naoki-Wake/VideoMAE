@@ -253,6 +253,8 @@ class PretrainVisionTransformer(nn.Module):
     def forward(self, x, mask):
         _, _, T, _, _ = x.shape
         x_vis = self.encoder(x, mask) # [B, N_vis, C_e]
+        # import copy
+        # x_vis_ret = copy.deepcopy(x_vis)
         x_vis = self.encoder_to_decoder(x_vis) # [B, N_vis, C_d]
         B, N, C = x_vis.shape
         # we don't unshuffle the correct visible token order, 
@@ -263,6 +265,7 @@ class PretrainVisionTransformer(nn.Module):
         x_full = torch.cat([x_vis + pos_emd_vis, self.mask_token + pos_emd_mask], dim=1) # [B, N, C_d]
         x = self.decoder(x_full, pos_emd_mask.shape[1]) # [B, N_mask, 3 * 16 * 16]
 
+        # return x, x_vis_ret # return this to extract encoded features
         return x
 
 @register_model
