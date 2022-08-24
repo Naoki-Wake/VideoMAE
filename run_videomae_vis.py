@@ -112,7 +112,7 @@ def main(args):
 
     model.to(device)
     checkpoint = torch.load(args.model_path, map_location='cpu')
-    model.load_state_dict(checkpoint['model'])
+    model.load_state_dict(checkpoint['module'])
     model.eval()
 
     if args.save_path:
